@@ -3,7 +3,10 @@
     - RGB
     - CMYk
     - HEX
+
 - It is build up on:
     - HTML
     - CSS
     - JAVASCRIPT
+
+- This is the link of the site to access it online https://mikebabu254.github.io/image-color-picker/
