@@ -1,4 +1,4 @@
-// Getting references
+// Getting references to elements
 const imageInput = document.getElementById("imageInput");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -9,47 +9,48 @@ const cmykEl = document.getElementById("cmyk");
 const pickedColor = document.getElementById("pickedColor");
 
 let img = new Image();
-let scale = 1;
+let scale = 1; 
 const ZOOM_STEP = 0.1;
 
-let offsetX = 0;
-let offsetY = 0;
-
-// Draw the image inside canvas with zoom
-function drawImage() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const newWidth = img.width * scale;
-    const newHeight = img.height * scale;
-
-    canvas.width = newWidth;
-    canvas.height = newHeight;
-
-    ctx.drawImage(img, 0, 0, newWidth, newHeight);
-
-    offsetX = 0;
-    offsetY = 0;
-}
-
-// Upload image
+// Load image when user selects a file
 imageInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
+    // ✅ Ensure only images are accepted
+    if (!file.type.startsWith("image/")) {
+        alert("Please upload an image file only!");
+        imageInput.value = ""; // reset input
+        return;
+    }
+
     img.src = URL.createObjectURL(file);
 
     img.onload = () => {
-        scale = 1;
+        canvas.width = img.width;
+        canvas.height = img.height;
         drawImage();
     };
 });
 
-// Click to pick color
+// Draw image with current zoom scale
+function drawImage() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+
+    ctx.scale(scale, scale);
+    ctx.drawImage(img, 0, 0);
+
+    ctx.restore();
+}
+
+// Canvas click → pick pixel color
 canvas.addEventListener("click", (e) => {
     const rect = canvas.getBoundingClientRect();
 
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    // Adjust click position based on zoom scale
+    const x = (e.clientX - rect.left) / scale;
+    const y = (e.clientY - rect.top) / scale;
 
     const pixel = ctx.getImageData(x, y, 1, 1).data;
     const [r, g, b] = pixel;
@@ -87,17 +88,24 @@ function rgbToCmyk(r, g, b) {
     y = ((y - k) / (1 - k)) * 100 || 0;
     k = k * 100;
 
-    return { c: Math.round(c), m: Math.round(m), y: Math.round(y), k: Math.round(k) };
+    return {
+        c: Math.round(c),
+        m: Math.round(m),
+        y: Math.round(y),
+        k: Math.round(k),
+    };
 }
 
-// Zoom In
-document.getElementById("zoomIn").onclick = () => {
+// Zoom in
+document.getElementById("zoomIn").addEventListener("click", () => {
     scale += ZOOM_STEP;
     drawImage();
-};
+});
 
-// Zoom Out
-document.getElementById("zoomOut").onclick = () => {
-    if (scale > ZOOM_STEP) scale -= ZOOM_STEP;
-    drawImage();
-};
+// Zoom out
+document.getElementById("zoomOut").addEventListener("click", () => {
+    if (scale > 0.2) {
+        scale -= ZOOM_STEP;
+        drawImage();
+    }
+});
