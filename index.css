@@ -29,3 +29,28 @@ body {
   border-radius: 8px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
+
+#canvasContainer {
+    width: 600px;     /* You can adjust this */
+    height: 400px;    /* You can adjust this */
+    border: 2px solid #ccc;
+    overflow: auto;   /* Enables scrollbars */
+    margin-top: 10px;
+}
+
+#pickedColor {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #000;
+    margin-bottom: 10px;
+}
+
+.controls {
+    margin-top: 10px;
+}
+
+button {
+    margin-right: 10px;
+    padding: 6px 10px;
+    cursor: pointer;
+}
